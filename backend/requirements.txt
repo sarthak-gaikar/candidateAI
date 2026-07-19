@@ -1,0 +1,56 @@
+# =============================================================================
+# AI Candidate Evaluation System — Python Dependencies
+# =============================================================================
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi[standard]==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.36
+alembic==1.14.1
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+greenlet==3.1.1
+
+# ── Data Validation & Settings ────────────────────────────────────────────────
+pydantic==2.10.4
+pydantic-settings==2.7.1
+email-validator==2.2.0
+
+# ── Authentication ────────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+
+# ── AI / LLM ─────────────────────────────────────────────────────────────────
+openai==1.58.1
+langchain==0.3.14
+langchain-openai==0.3.0
+langchain-google-genai==2.0.8
+langchain-community==0.3.14
+
+# ── Embeddings & ML ──────────────────────────────────────────────────────────
+sentence-transformers==3.3.1
+scikit-learn==1.6.1
+numpy==1.26.4
+
+# ── Speech-to-Text ───────────────────────────────────────────────────────────
+openai-whisper==20240930
+
+# ── Document Processing ──────────────────────────────────────────────────────
+PyPDF2==3.0.1
+pdfplumber==0.11.4
+python-docx==1.1.2
+
+# ── Report Generation ────────────────────────────────────────────────────────
+fpdf2==2.8.2
+
+# ── Media Processing ─────────────────────────────────────────────────────────
+moviepy==2.1.1
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+httpx==0.28.1
+aiofiles==24.1.0
