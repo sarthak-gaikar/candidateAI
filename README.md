@@ -26,29 +26,29 @@ docker-compose up --build
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  Frontend (React + Vite + Tailwind + ShadCN)             │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐  │
-│  │Dashboard │ │Candidates│ │ Rankings │ │ AI Search  │  │
-│  └──────────┘ └──────────┘ └──────────┘ └────────────┘  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐   │
+│  │Dashboard │ │Candidates│ │ Rankings │ │ AI Search  │   │
+│  └──────────┘ └──────────┘ └──────────┘ └────────────┘   │
 └──────────────────────┬───────────────────────────────────┘
                        │ REST API
 ┌──────────────────────▼───────────────────────────────────┐
-│  Backend (FastAPI)                                        │
-│  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌─────────────┐  │
-│  │  Auth   │ │ Services │ │   AI     │ │ Repositories│  │
-│  │  JWT    │ │  Layer   │ │ Pipeline │ │   Layer     │  │
-│  └─────────┘ └──────────┘ └──────────┘ └─────────────┘  │
+│  Backend (FastAPI)                                       │
+│  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌─────────────┐   │
+│  │  Auth   │ │ Services │ │   AI     │ │ Repositories│   │
+│  │  JWT    │ │  Layer   │ │ Pipeline │ │   Layer     │   │
+│  └─────────┘ └──────────┘ └──────────┘ └─────────────┘   │
 │                               │                          │
 │  ┌────────────────────────────▼──────────────────────┐   │
-│  │  AI Services                                       │   │
+│  │  AI Services                                      │   │
 │  │  • OpenAI GPT / Gemini (Resume + Interview LLM)   │   │
-│  │  • Whisper (Speech-to-Text)                        │   │
-│  │  • Sentence Transformers (Embeddings)              │   │
-│  │  • Scikit-learn (Clustering)                       │   │
-│  └────────────────────────────────────────────────────┘   │
+│  │  • Whisper (Speech-to-Text)                       │   │
+│  │  • Sentence Transformers (Embeddings)             │   │
+│  │  • Scikit-learn (Clustering)                      │   │
+│  └───────────────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────────────┘
                        │
 ┌──────────────────────▼───────────────────────────────────┐
-│  PostgreSQL Database                                      │
+│  PostgreSQL Database                                     │
 │  Users | Candidates | Resumes | Interviews | Scores      │
 └──────────────────────────────────────────────────────────┘
 ```
