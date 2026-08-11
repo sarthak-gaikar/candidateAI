@@ -126,3 +126,19 @@ class ResumeService:
     async def get_by_candidate(self, candidate_id: UUID) -> Resume | None:
         """Get resume for a candidate."""
         return await self.resume_repo.get_by_candidate_id(candidate_id)
+
+    async def delete_resume(self, resume_id: UUID) -> None:
+        """Delete a resume and update candidate status."""
+        resume = await self.resume_repo.get_by_id(resume_id)
+        if not resume:
+            raise ValueError("Resume not found.")
+
+        candidate = await self.candidate_repo.get_by_id(resume.candidate_id)
+        await self.resume_repo.delete(resume)
+
+        if candidate:
+            if candidate.interview:
+                candidate.status = CandidateStatus.INTERVIEW_ANALYZED
+            else:
+                candidate.status = CandidateStatus.PENDING
+            await self.candidate_repo.update(candidate)

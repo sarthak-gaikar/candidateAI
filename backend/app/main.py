@@ -27,7 +27,22 @@ async def lifespan(app: FastAPI):
     print(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION} starting...")
     print(f"   LLM Provider: {settings.LLM_PROVIDER}")
     print(f"   Whisper Mode: {settings.WHISPER_MODE}")
-    print(f"   Database: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}")
+    database_label = (
+        "configured via DATABASE_URL"
+        if settings.DATABASE_URL
+        else f"{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+    )
+    print(f"   Database: {database_label}")
+
+    # Ensure database tables exist
+    try:
+        from app.database import engine, Base
+        import app.models  # noqa: F401
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("   Database tables verified.")
+    except Exception as e:
+        print(f"   Warning: Database init error: {e}")
 
     yield
 

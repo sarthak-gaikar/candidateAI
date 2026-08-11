@@ -2,7 +2,6 @@
  * Sidebar navigation component with collapsible drawer.
  */
 
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,8 +26,12 @@ const navItems = [
   { path: "/search", icon: Search, label: "AI Search" },
 ];
 
-export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+interface SidebarProps {
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}
+
+export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
   const { user, logout } = useAuth();
 
   return (

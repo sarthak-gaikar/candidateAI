@@ -102,7 +102,7 @@ CC/
 
 ---
 
-## 🛠️ Manual Setup (Without Docker)
+## 🛠️ Local & Docker Setup
 
 ### Backend
 
@@ -113,18 +113,18 @@ cd backend
 python -m venv venv
 source venv/bin/activate  # or: venv\Scripts\activate on Windows
 
-# Install dependencies
+# Install lightweight core dependencies (fast ~80MB download)
 pip install -r requirements.txt
+
+# (Optional) Install local PyTorch & local offline Whisper model if needed:
+# pip install -r requirements-ml.txt
 
 # Configure environment
 cp ../.env.example .env
-# Edit .env with your settings
+# Edit .env with your settings (e.g. OPENAI_API_KEY)
 
-# Run database migrations
-alembic upgrade head
-
-# Start the server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Start the backend server
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ### Frontend

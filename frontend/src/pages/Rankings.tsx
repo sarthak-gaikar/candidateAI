@@ -24,7 +24,7 @@ export default function Rankings() {
     fetchRankings();
   }, []);
 
-  const fetchRankings = async () => {
+  async function fetchRankings() {
     try {
       const res = await api.get("/rankings");
       setRankings(res.data);
@@ -33,7 +33,7 @@ export default function Rankings() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const recalculate = async () => {
     setRecalculating(true);

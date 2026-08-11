@@ -14,7 +14,8 @@ from app.services.ranking_service import RankingService
 router = APIRouter()
 
 
-@router.get("/", response_model=list[RankingEntry])
+@router.get("", response_model=list[RankingEntry])
+@router.get("/", response_model=list[RankingEntry], include_in_schema=False)
 async def get_rankings(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

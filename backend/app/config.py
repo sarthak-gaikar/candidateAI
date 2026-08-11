@@ -56,16 +56,14 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # ── AI / LLM ─────────────────────────────────────────────────────────
-    LLM_PROVIDER: str = "openai"  # "openai" or "gemini"
-    OPENAI_API_KEY: str = ""
+    LLM_PROVIDER: str = "gemini"
     GEMINI_API_KEY: str = ""
-    LLM_MODEL: str = "gpt-4o"
+    LLM_MODEL: str = "gemini-2.5-flash"
     LLM_TEMPERATURE: float = 0.1
     LLM_MAX_TOKENS: int = 4096
 
-    # ── Whisper ───────────────────────────────────────────────────────────
-    WHISPER_MODE: str = "api"  # "api" or "local"
-    WHISPER_MODEL: str = "whisper-1"
+    # ── Whisper / Audio Transcription ─────────────────────────────────────
+    WHISPER_MODE: str = "api"  # "api" (Gemini API) or "local" (local whisper model)
     WHISPER_LOCAL_MODEL: str = "base"  # For local mode: tiny, base, small, medium, large
 
     # ── Embeddings ────────────────────────────────────────────────────────

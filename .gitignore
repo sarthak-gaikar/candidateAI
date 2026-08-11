@@ -1,0 +1,17 @@
+# Local configuration and generated runtime data
+.env
+.env.*
+!.env.example
+backend/.env
+backend/uploads/
+frontend/dist/
+frontend/node_modules/
+
+# Python and tooling artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+venv/
+.venv/

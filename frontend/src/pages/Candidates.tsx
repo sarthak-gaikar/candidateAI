@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Upload, Search, Filter, X, FileUp, Video } from "lucide-react";
+import { Plus, Upload, Search, Users, X, FileUp, Video, Trash2 } from "lucide-react";
 import api from "@/lib/api";
 import { RECOMMENDATION_LABELS, getScoreClass, STATUS_LABELS } from "@/lib/constants";
 
@@ -38,7 +38,7 @@ export default function Candidates() {
     fetchCandidates();
   }, [page, search]);
 
-  const fetchCandidates = async () => {
+  async function fetchCandidates() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: String(page), page_size: "20" });
@@ -50,6 +50,26 @@ export default function Candidates() {
       console.error("Failed to fetch candidates:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  const handleDeleteCandidate = async (
+    candidateId: string,
+    candidateName: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+    if (!window.confirm(`Delete ${candidateName}? This cannot be undone.`)) return;
+
+    try {
+      await api.delete(`/candidates/${candidateId}`);
+      if (candidates.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        await fetchCandidates();
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete candidate");
     }
   };
 
@@ -155,7 +175,7 @@ export default function Candidates() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b" style={{ borderColor: "var(--border)" }}>
-                {["Name", "Email", "Status", "Score", "Recommendation", "Rank", "Created"].map((h) => (
+                {["Name", "Email", "Status", "Score", "Recommendation", "Rank", "Created", "Actions"].map((h) => (
                   <th key={h} className="text-left px-5 py-3 font-medium text-xs uppercase tracking-wide" style={{ color: "var(--muted-foreground)" }}>{h}</th>
                 ))}
               </tr>
@@ -164,7 +184,7 @@ export default function Candidates() {
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={i} className="border-b" style={{ borderColor: "var(--border)" }}>
-                    {[...Array(7)].map((_, j) => (
+                    {[...Array(8)].map((_, j) => (
                       <td key={j} className="px-5 py-3"><div className="skeleton h-4 w-20 rounded" /></td>
                     ))}
                   </tr>
@@ -202,12 +222,21 @@ export default function Candidates() {
                       <td className="px-5 py-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
                         {new Date(c.created_at).toLocaleDateString()}
                       </td>
+                      <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => handleDeleteCandidate(c.id, c.name, e)}
+                          className="p-1.5 rounded-md hover:bg-red-500/20 text-red-400 transition-colors"
+                          title="Delete Candidate"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
                     </motion.tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-5 py-16 text-center" style={{ color: "var(--muted-foreground)" }}>
+                  <td colSpan={8} className="px-5 py-16 text-center" style={{ color: "var(--muted-foreground)" }}>
                     <Users className="w-12 h-12 mx-auto mb-3 opacity-20" />
                     <p className="font-medium">No candidates found</p>
                     <p className="text-xs mt-1">Add your first candidate to begin evaluation</p>

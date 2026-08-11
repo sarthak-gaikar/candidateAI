@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from "recharts";
 import api from "@/lib/api";
-import { RECOMMENDATION_LABELS, getScoreClass, getScoreLabel } from "@/lib/constants";
+import { RECOMMENDATION_LABELS, getScoreClass } from "@/lib/constants";
 
 type Tab = "overview" | "resume" | "interview" | "report";
 
@@ -27,7 +27,7 @@ export default function CandidateDetail() {
     fetchCandidate();
   }, [id]);
 
-  const fetchCandidate = async () => {
+  async function fetchCandidate() {
     try {
       const res = await api.get(`/candidates/${id}`);
       setCandidate(res.data);
@@ -36,7 +36,7 @@ export default function CandidateDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const generateReport = async (format: string) => {
     setGeneratingReport(true);

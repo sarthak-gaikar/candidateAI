@@ -27,7 +27,8 @@ class SimilarRequest(BaseModel):
     top_k: int = 10
 
 
-@router.post("/")
+@router.post("")
+@router.post("/", include_in_schema=False)
 async def search_candidates(
     request: SearchRequest,
     current_user: User = Depends(get_current_user),

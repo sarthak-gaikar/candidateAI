@@ -28,7 +28,7 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  async function fetchData() {
     try {
       const res = await api.get("/candidates?page_size=100");
       const items = res.data.items || [];
@@ -46,7 +46,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   // Chart data
   const scoreDistribution = [

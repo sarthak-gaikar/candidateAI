@@ -45,3 +45,8 @@ class ResumeRepository:
             select(Resume).where(Resume.embedding.isnot(None))
         )
         return list(result.scalars().all())
+
+    async def delete(self, resume: Resume) -> None:
+        """Delete a resume entity."""
+        await self.db.delete(resume)
+        await self.db.flush()

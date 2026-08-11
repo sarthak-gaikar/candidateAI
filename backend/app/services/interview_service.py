@@ -122,3 +122,19 @@ class InterviewService:
     async def get_by_candidate(self, candidate_id: UUID) -> Interview | None:
         """Get interview for a candidate."""
         return await self.interview_repo.get_by_candidate_id(candidate_id)
+
+    async def delete_interview(self, interview_id: UUID) -> None:
+        """Delete an interview and update candidate status."""
+        interview = await self.interview_repo.get_by_id(interview_id)
+        if not interview:
+            raise ValueError("Interview not found.")
+
+        candidate = await self.candidate_repo.get_by_id(interview.candidate_id)
+        await self.interview_repo.delete(interview)
+
+        if candidate:
+            if candidate.resume:
+                candidate.status = CandidateStatus.RESUME_ANALYZED
+            else:
+                candidate.status = CandidateStatus.PENDING
+            await self.candidate_repo.update(candidate)

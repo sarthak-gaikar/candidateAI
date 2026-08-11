@@ -62,10 +62,31 @@ class Candidate(Base, UUIDMixin, TimestampMixin):
 
     # ── Relationships ────────────────────────────────────────────────────
     created_by_user = relationship("User", back_populates="candidates")
-    resume = relationship("Resume", back_populates="candidate", uselist=False, lazy="selectin")
-    interview = relationship("Interview", back_populates="candidate", uselist=False, lazy="selectin")
-    score = relationship("Score", back_populates="candidate", uselist=False, lazy="selectin")
-    reports = relationship("Report", back_populates="candidate", lazy="selectin")
+    resume = relationship(
+        "Resume",
+        back_populates="candidate",
+        uselist=False,
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
+    interview = relationship(
+        "Interview",
+        back_populates="candidate",
+        uselist=False,
+        lazy="selectin",
+    )
+    score = relationship(
+        "Score",
+        back_populates="candidate",
+        uselist=False,
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
+    reports = relationship(
+        "Report",
+        back_populates="candidate",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return f"<Candidate {self.name} ({self.status.value})>"

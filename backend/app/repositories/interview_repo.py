@@ -38,3 +38,8 @@ class InterviewRepository:
         await self.db.flush()
         await self.db.refresh(interview)
         return interview
+
+    async def delete(self, interview: Interview) -> None:
+        """Delete an interview entity."""
+        await self.db.delete(interview)
+        await self.db.flush()

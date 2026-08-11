@@ -32,7 +32,7 @@ export default function Search() {
     }
   }, [searchParams]);
 
-  const handleSearch = async (q?: string) => {
+  async function handleSearch(q?: string) {
     const searchQuery = q || query;
     if (!searchQuery.trim()) return;
 
@@ -47,7 +47,7 @@ export default function Search() {
     } finally {
       setSearching(false);
     }
-  };
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

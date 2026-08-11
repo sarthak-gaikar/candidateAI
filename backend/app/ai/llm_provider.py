@@ -10,7 +10,7 @@ import logging
 from typing import Type
 
 from pydantic import BaseModel
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.config import settings
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class LLMProvider:
     """
-    Unified LLM interface supporting OpenAI and Gemini.
+    LLM interface using Google Gemini AI.
 
     Usage:
         provider = LLMProvider()
@@ -28,37 +28,17 @@ class LLMProvider:
     """
 
     def __init__(self):
-        self.provider = settings.LLM_PROVIDER
         self._llm = self._create_llm()
 
     def _create_llm(self):
-        """Create the appropriate LangChain LLM client based on config."""
-        if self.provider == "openai":
-            return ChatOpenAI(
-                model=settings.LLM_MODEL,
-                temperature=settings.LLM_TEMPERATURE,
-                max_tokens=settings.LLM_MAX_TOKENS,
-                api_key=settings.OPENAI_API_KEY,
-            )
-        elif self.provider == "gemini":
-            try:
-                from langchain_google_genai import ChatGoogleGenerativeAI
-                return ChatGoogleGenerativeAI(
-                    model="gemini-1.5-pro",
-                    temperature=settings.LLM_TEMPERATURE,
-                    max_tokens=settings.LLM_MAX_TOKENS,
-                    google_api_key=settings.GEMINI_API_KEY,
-                )
-            except ImportError:
-                logger.warning("langchain-google-genai not installed, falling back to OpenAI")
-                return ChatOpenAI(
-                    model=settings.LLM_MODEL,
-                    temperature=settings.LLM_TEMPERATURE,
-                    max_tokens=settings.LLM_MAX_TOKENS,
-                    api_key=settings.OPENAI_API_KEY,
-                )
-        else:
-            raise ValueError(f"Unsupported LLM provider: {self.provider}")
+        """Create Google Gemini LangChain LLM client based on config."""
+        model_name = settings.LLM_MODEL or "gemini-2.5-flash"
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            temperature=settings.LLM_TEMPERATURE,
+            max_output_tokens=settings.LLM_MAX_TOKENS,
+            google_api_key=settings.GEMINI_API_KEY,
+        )
 
     async def analyze(
         self,
@@ -83,17 +63,20 @@ class LLMProvider:
         ]
 
         try:
+            if response_model:
+                structured_llm = self._llm.with_structured_output(response_model)
+                result = await structured_llm.ainvoke(messages)
+
+                if isinstance(result, BaseModel):
+                    return result.model_dump()
+
+                return result
+
             response = await self._llm.ainvoke(messages)
             content = response.content
 
-            # Extract JSON from the response (handle markdown code blocks)
             json_str = self._extract_json(content)
             parsed = json.loads(json_str)
-
-            # Validate against Pydantic model if provided
-            if response_model:
-                validated = response_model(**parsed)
-                return validated.model_dump()
 
             return parsed
 
@@ -103,26 +86,64 @@ class LLMProvider:
             raise ValueError(f"LLM returned invalid JSON: {e}")
         except Exception as e:
             logger.error(f"LLM analysis failed: {e}")
+            if 'content' in locals():
+                logger.error(f"Raw LLM response: {content[:2000]}")
             raise
 
+    # def _extract_json(self, text: str) -> str:
+    #     """Extract JSON from LLM response, handling markdown code blocks."""
+    #     text = text.strip()
+
+    #     # Handle ```json ... ``` blocks
+    #     if "```json" in text:
+    #         start = text.index("```json") + 7
+    #         end = text.index("```", start)
+    #         return text[start:end].strip()
+
+    #     # Handle ``` ... ``` blocks
+    #     if text.startswith("```"):
+    #         start = text.index("\n") + 1
+    #         end = text.rindex("```")
+    #         return text[start:end].strip()
+
+    #     # Already plain JSON
+    #     return text
     def _extract_json(self, text: str) -> str:
-        """Extract JSON from LLM response, handling markdown code blocks."""
         text = text.strip()
 
-        # Handle ```json ... ``` blocks
+        # Case 1: ```json ... ```
         if "```json" in text:
-            start = text.index("```json") + 7
-            end = text.index("```", start)
-            return text[start:end].strip()
+            start = text.find("```json") + len("```json")
+            end = text.find("```", start)
 
-        # Handle ``` ... ``` blocks
+            if end != -1:
+                return text[start:end].strip()
+
+        # Case 2: ``` ... ```
         if text.startswith("```"):
-            start = text.index("\n") + 1
-            end = text.rindex("```")
-            return text[start:end].strip()
+            first_newline = text.find("\n")
 
-        # Already plain JSON
-        return text
+            if first_newline != -1:
+                end = text.find("```", first_newline + 1)
+
+                if end != -1:
+                    return text[first_newline + 1:end].strip()
+
+        # Case 3: Plain JSON
+        if text.startswith("{") and text.endswith("}"):
+            return text
+
+        # Case 4: JSON embedded in additional text
+        start = text.find("{")
+        end = text.rfind("}")
+
+        if start != -1 and end != -1 and end > start:
+            return text[start:end + 1].strip()
+
+        raise ValueError(
+            f"Could not find JSON object in LLM response. "
+            f"Response preview: {text[:500]}"
+        )
 
 
 # ── Module-level singleton ───────────────────────────────────────────────

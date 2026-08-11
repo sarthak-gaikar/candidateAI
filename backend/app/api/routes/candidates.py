@@ -21,7 +21,8 @@ from app.services.candidate_service import CandidateService
 router = APIRouter()
 
 
-@router.post("/", response_model=CandidateListResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CandidateListResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=CandidateListResponse, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_candidate(
     data: CandidateCreate,
     current_user: User = Depends(get_current_user),
@@ -46,7 +47,8 @@ async def create_candidate(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/", response_model=dict)
+@router.get("", response_model=dict)
+@router.get("/", response_model=dict, include_in_schema=False)
 async def list_candidates(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),

@@ -61,24 +61,27 @@ class InterviewAnalyzer:
             raise ValueError(f"Could not extract audio from video: {e}")
 
     async def transcribe_api(self, audio_path: str) -> str:
-        """Transcribe audio using OpenAI Whisper API."""
+        """Transcribe audio using Google Gemini API."""
         try:
-            from openai import OpenAI
+            import google.generativeai as genai
 
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            genai.configure(api_key=settings.GEMINI_API_KEY)
 
-            with open(audio_path, "rb") as audio_file:
-                transcript = client.audio.transcriptions.create(
-                    model=settings.WHISPER_MODEL,
-                    file=audio_file,
-                    response_format="text",
-                )
+            # Upload audio file to Gemini API
+            audio_file = genai.upload_file(audio_path)
+            model = genai.GenerativeModel("gemini-2.5-flash")
 
-            logger.info(f"API transcription complete: {len(str(transcript))} chars")
-            return str(transcript)
+            response = model.generate_content([
+                "Generate a clear and accurate verbatim transcription of this audio interview. Return only the transcript text without any introductory commentary or markdown formatting.",
+                audio_file
+            ])
+
+            transcript = response.text.strip()
+            logger.info(f"Gemini API transcription complete: {len(transcript)} chars")
+            return transcript
 
         except Exception as e:
-            logger.error(f"Whisper API transcription failed: {e}")
+            logger.error(f"Gemini API transcription failed: {e}")
             raise ValueError(f"Transcription failed: {e}")
 
     def transcribe_local(self, audio_path: str) -> str:
@@ -93,6 +96,13 @@ class InterviewAnalyzer:
             logger.info(f"Local transcription complete: {len(transcript)} chars")
             return transcript
 
+        except ImportError:
+            msg = (
+                "Local Whisper package is not installed. Please set WHISPER_MODE=api in your .env "
+                "or install optional local ML dependencies: pip install -r requirements-ml.txt"
+            )
+            logger.error(msg)
+            raise ValueError(msg)
         except Exception as e:
             logger.error(f"Local Whisper transcription failed: {e}")
             raise ValueError(f"Local transcription failed: {e}")

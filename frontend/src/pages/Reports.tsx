@@ -15,7 +15,7 @@ export default function Reports() {
     fetchReports();
   }, []);
 
-  const fetchReports = async () => {
+  async function fetchReports() {
     try {
       const res = await api.get("/reports");
       setReports(res.data);
@@ -24,7 +24,7 @@ export default function Reports() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const downloadReport = async (reportId: string, format: string) => {
     try {

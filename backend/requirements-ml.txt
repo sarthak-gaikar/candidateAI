@@ -1,0 +1,15 @@
+# =============================================================================
+# AI Candidate Evaluation System — Optional Heavy ML Dependencies
+# Use if you need LOCAL offline Whisper model or LOCAL PyTorch embeddings
+# =============================================================================
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Lightweight CPU PyTorch (150MB instead of 2.5GB CUDA PyTorch)
+torch>=2.0.0
+
+# Local embedding model
+sentence-transformers>=3.3.0
+
+# Local offline Whisper model
+openai-whisper>=20240930
